@@ -2,13 +2,24 @@
 <html lang="en">
 <head>
     <%- include('./partials/head') %>
-    <link rel="stylesheet" href="/CSS/style.css">
+    <!-- <link rel="stylesheet" href="/CSS/style.css"> -->
     <title>Bookify</title>
 </head>
 <body>
     <%- include('./partials/nav') %>
+    <div class="container mt-3">
+        <% books.forEach(book => { %>
+            <div class="card" style="width: 18rem;">
+                <img src="<%= book.coverImageURL %>" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title"><%= book.title %></h5>
+                  <a href="/book/<%= book._id %>" class="btn btn-primary">Borrow</a>
+                </div>
+              </div>
+        <% }); %>
+    </div>
     <%- include('./partials/scripts') %>
-    <main class="books">
+    <!-- <main class="books">
         <div class="square">
             <img src="/5am.jpg">
             <div class="content">
@@ -61,6 +72,6 @@
             <div class="content">
                 <div class="action_btn">Borrow</div>
             </div></div>
-</main>
+</main> -->
 </body>
 </html>
