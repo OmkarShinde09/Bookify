@@ -3,6 +3,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cookieParser = require('cookie-parser');
 
+var session = require('express-session');
+var flush = require('connect-flash');
+
 const Book = require('./models/book');
 
 const userRoute = require('./routes/user');
@@ -23,9 +26,19 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(checkForAuthenticationCookie("token"));
 
+app.use(session({
+    secret: 'secret',
+    cookie: {maxAge: 6000},
+    resave: false,
+    saveUninitialized: false,
+}));
+app.use(flush());
+
+
 app.get("/", async (req, res) =>{
     const allBooks = await Book.find({});
     res.render("home", {
+        message: req.flash('message'),
         user: req.user,
         books: allBooks,
     });

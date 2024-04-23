@@ -24,12 +24,60 @@ router.get('/add-new', (req, res) => {
     });
 });
 
+router.get("/:id", async (req, res) => {
+    const book = await Book.findById(req.params.id);
+    // const comments = await Comment.find({ blogId: req.params.id }).populate(
+    //   "createdBy"
+    // );
+  
+    return res.render("book", {
+      user: req.user,
+      book,
+    });
+  });
+
+
+router.get('/borrow/:id', async(req, res) => {
+    const book = await Book.findById(req.params.id);
+        return res.render('borrow', {
+            book,
+        });
+});
+
+router.get('/return/:id', async(req, res) => {
+    const book = await Book.findById(req.params.id);
+    return res.render('return', {
+        book,
+    });
+});
+router.post('/borrow/:id', async (req, res) => {
+    const book = await Book.findById(req.params.id);
+
+    if(book.borrowedBy !== null) {
+        req.flash('message', 'Book already Borrowed. Please wait for it to be returned');
+        return res.redirect('/');
+    } 
+    else{
+        await Book.findByIdAndUpdate(book._id, { borrowedBy: req.user._id });
+
+        return res.redirect('/');
+    }
+});
+
+router.post('/return/:id', async (req, res) => {
+    const book = await Book.findById(req.params.id);
+    await Book.findByIdAndUpdate(book._id, { borrowedBy: null});
+
+    return res.redirect('/');
+})
+
 router.post('/', upload.single("coverImage"), async (req, res) => {   
     const { title, description} = req.body;
     const book = await Book.create({
         description,
         title,
         uploadedBy: req.user._id,
+        borrowedBy: null,
         coverImageURL: `/uploads/${req.file.filename}`,
     });
     return res.redirect(`/book/${book._id}`);
