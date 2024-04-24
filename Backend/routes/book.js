@@ -3,6 +3,7 @@ const multer = require('multer');
 const path = require('path');
 
 const Book = require('../models/book');
+const Comment = require('../models/comment');
 
 const router = Router();
 
@@ -25,15 +26,24 @@ router.get('/add-new', (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-    const book = await Book.findById(req.params.id);
-    // const comments = await Comment.find({ blogId: req.params.id }).populate(
-    //   "createdBy"
-    // );
-  
+    const book = await Book.findById(req.params.id).populate("uploadedBy");
+    const comments = await Comment.find({ bookId: req.params.id }).populate(
+      "createdBy"
+    );
     return res.render("book", {
       user: req.user,
       book,
+      comments,
     });
+});
+
+router.post("/comment/:bookId", async (req, res) => {
+    await Comment.create({
+      content: req.body.content,
+      bookId: req.params.bookId,
+      createdBy: req.user._id,
+    });
+    return res.redirect(`/book/${req.params.bookId}`);
   });
 
 
