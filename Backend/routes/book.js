@@ -49,9 +49,15 @@ router.post("/comment/:bookId", async (req, res) => {
 
 router.get('/borrow/:id', async(req, res) => {
     const book = await Book.findById(req.params.id);
+    if(book.borrowedBy !== null) {
+        req.flash('message', 'Book already Borrowed. Please wait for it to be returned');
+        return res.redirect('/');
+    } 
+    else{
         return res.render('borrow', {
             book,
         });
+    }
 });
 
 router.get('/return/:id', async(req, res) => {
@@ -60,6 +66,7 @@ router.get('/return/:id', async(req, res) => {
         book,
     });
 });
+
 router.post('/borrow/:id', async (req, res) => {
     const book = await Book.findById(req.params.id);
 
